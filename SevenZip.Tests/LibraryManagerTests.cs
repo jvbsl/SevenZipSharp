@@ -8,7 +8,7 @@
         [Test]
         public void SetNonExistant7zDllLocationTest()
         {
-            Assert.Throws<SevenZipLibraryException>(() => SevenZipLibraryManager.SetLibraryPath("null"));
+            Assert.Throws<SevenZipLibraryException>(() => SevenZipLibraryManager.Instance.SetLibraryPath("null"));
         }
 
         [Test]
@@ -17,7 +17,7 @@
             var features = SevenZipBase.CurrentLibraryFeatures;
 
             // Exercising more code paths...
-            features = SevenZipLibraryManager.CurrentLibraryFeatures;
+            features = SevenZipLibraryManager.Instance.CurrentLibraryFeatures;
 
             Assert.IsTrue(features.HasFlag(LibraryFeature.ExtractAll));
             Assert.IsTrue(features.HasFlag(LibraryFeature.CompressAll));

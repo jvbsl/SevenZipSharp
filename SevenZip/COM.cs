@@ -701,7 +701,7 @@
         /// </summary>
         /// <param name="password">Password for the archive</param>
         /// <returns>Zero if everything is OK</returns>
-        [PreserveSig]
+        
         int CryptoGetTextPassword(
             [MarshalAs(UnmanagedType.BStr)] out string password);
     }
@@ -720,7 +720,7 @@
         /// <param name="passwordIsDefined">Specifies whether archive has a password or not (0 if not)</param>
         /// <param name="password">Password for the archive</param>
         /// <returns>Zero if everything is OK</returns>
-        [PreserveSig]
+        
         int CryptoGetTextPassword2(
             ref int passwordIsDefined,
             [MarshalAs(UnmanagedType.BStr)] out string password);
@@ -753,10 +753,10 @@
         /// <param name="outStream">Pointer to the stream</param>
         /// <param name="askExtractMode">Extraction mode</param>
         /// <returns>S_OK - OK, S_FALSE - skip this file</returns>
-        [PreserveSig]
+        
         int GetStream(
             uint index,
-            [Out, MarshalAs(UnmanagedType.Interface)] out ISequentialOutStream outStream,
+            out ISequentialOutStream outStream,
             AskMode askExtractMode);
 
         /// <summary>
@@ -800,7 +800,7 @@
         /// <param name="newProperties">1 if new, 0 if not</param>
         /// <param name="indexInArchive">-1 if doesn't matter</param>
         /// <returns></returns>
-        [PreserveSig]
+        
         int GetUpdateItemInfo(
             uint index, ref int newData,
             ref int newProperties, ref uint indexInArchive);
@@ -812,7 +812,7 @@
         /// <param name="propId">Property identifier</param>
         /// <param name="value">Property value</param>
         /// <returns>Zero if Ok</returns>
-        [PreserveSig]
+        
         int GetProperty(uint index, ItemPropId propId, ref PropVariant value);
 
         /// <summary>
@@ -821,7 +821,7 @@
         /// <param name="index">The item index.</param>
         /// <param name="inStream">The ISequentialInStream pointer for reading.</param>
         /// <returns>Zero if Ok</returns>
-        [PreserveSig]
+        
         int GetStream(
             uint index,
             [Out, MarshalAs(UnmanagedType.Interface)] out ISequentialInStream inStream);
@@ -853,7 +853,7 @@
         /// </summary>
         /// <param name="propId">The property identificator.</param>
         /// <param name="value">The property value.</param>
-        [PreserveSig]
+        
         int GetProperty(
             ItemPropId propId, ref PropVariant value);
 
@@ -863,7 +863,7 @@
         /// <param name="name">The volume file name.</param>
         /// <param name="inStream">The IInStream pointer for reading.</param>
         /// <returns>Zero if Ok</returns>
-        [PreserveSig]
+        
         int GetStream(
             [MarshalAs(UnmanagedType.LPWStr)] string name,
             [Out, MarshalAs(UnmanagedType.Interface)] out IInStream inStream);
@@ -915,7 +915,6 @@
         /// This function is allowed to rwrite less than "size" bytes.
         /// You must call Write function in loop, if you need exact amount of data.
         /// </remarks>
-        [PreserveSig]
         int Write(
             [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] data,
             uint size, IntPtr processedSize);
@@ -964,7 +963,7 @@
         /// <param name="size">Array size</param>
         /// <param name="processedSize">Processed size</param>
         /// <returns>Zero if Ok</returns>
-        [PreserveSig]
+        
         int Write(
             [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] data,
             uint size,
@@ -984,7 +983,7 @@
         /// </summary>
         /// <param name="newSize">New size value</param>
         /// <returns>Zero if Ok</returns>
-        [PreserveSig]
+        
         int SetSize(long newSize);
     }
 
@@ -1003,11 +1002,11 @@
         /// <param name="maxCheckStartPosition">Maximum start position for checking</param>
         /// <param name="openArchiveCallback">Callback for opening archive</param>
         /// <returns></returns>
-        [PreserveSig]
+        
         int Open(
             IInStream stream,
             [In] ref ulong maxCheckStartPosition,
-            [MarshalAs(UnmanagedType.Interface)] IArchiveOpenCallback openArchiveCallback);
+            IArchiveOpenCallback openArchiveCallback);
 
         /// <summary>
         /// Closes the archive.
@@ -1039,7 +1038,7 @@
         /// <param name="testMode">testMode != 0 means "test files operation"</param>
         /// <param name="extractCallback">IArchiveExtractCallback for operations handling</param>
         /// <returns>0 if success</returns>
-        [PreserveSig]
+        
         int Extract(
             [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] uint[] indexes,
             uint numItems,
@@ -1109,7 +1108,7 @@
         /// <param name="numItems">Number of archive items</param>
         /// <param name="updateCallback">The IArchiveUpdateCallback pointer</param>
         /// <returns>Zero if Ok</returns>
-        [PreserveSig]
+        
         int UpdateItems(
             [MarshalAs(UnmanagedType.Interface)] ISequentialOutStream outStream,
             uint numItems,
@@ -1140,4 +1139,4 @@
         int SetProperties(IntPtr names, IntPtr values, int numProperties);
     }
 #endif
-            }
+}

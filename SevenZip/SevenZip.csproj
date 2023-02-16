@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyName>SevenZipSharp</AssemblyName>
     <TargetFrameworks>netstandard2.0;net45;netcoreapp3.1</TargetFrameworks>
-    <SignAssembly>true</SignAssembly>
+<!--    <SignAssembly>true</SignAssembly>-->
     <AssemblyOriginatorKeyFile>SevenZip.snk</AssemblyOriginatorKeyFile>
     <AssemblyTitle>SevenZipSharp</AssemblyTitle>
     <Company>Markovtsev Vadim</Company>

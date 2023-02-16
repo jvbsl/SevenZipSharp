@@ -16,8 +16,9 @@ namespace SevenZip
     /// <summary>
     /// 7-zip library low-level wrapper.
     /// </summary>
-    internal static class SevenZipLibraryManager
+    internal abstract partial class SevenZipLibraryManagerBase
     {
+
         /// <summary>
         /// Synchronization root for all locking.
         /// </summary>
@@ -33,39 +34,35 @@ namespace SevenZip
         ///     - Built decoders: LZMA, PPMD, BCJ, BCJ2, COPY, AES-256 Encryption, BZip2, Deflate.
         /// 7z.dll (from the 7-zip distribution) supports every InArchiveFormat for encoding and decoding.
         /// </remarks>
-        private static string _libraryFileName;
+        private string _libraryFileName;
 
-        private static string DetermineLibraryFilePath()
-        {
-            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["7zLocation"]))
-            {
-                return ConfigurationManager.AppSettings["7zLocation"];
-            }
-	
-            if (string.IsNullOrEmpty(Assembly.GetExecutingAssembly().Location)) 
-            {
-                return null;
-            }
+        protected abstract string DetermineLibraryFilePath();
+        
+        
+        public abstract string GetLastError();
 
-            return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Environment.Is64BitProcess ? "7z64.dll" : "7z.dll");
-        }
+        public abstract IntPtr NativeLoadLibrary(string fileName);
+        
+        public abstract bool NativeFreeLibrary(IntPtr hModule);
+
+        public abstract IntPtr NativeGetProcAddress(IntPtr hModule, string procName);
 
         /// <summary>
         /// 7-zip library handle.
         /// </summary>
-        private static IntPtr _modulePtr;
+        private IntPtr _modulePtr;
 
         /// <summary>
         /// 7-zip library features.
         /// </summary>
-        private static LibraryFeature? _features;
+        private LibraryFeature? _features;
 
-        private static Dictionary<object, Dictionary<InArchiveFormat, IInArchive>> _inArchives;
-        private static Dictionary<object, Dictionary<OutArchiveFormat, IOutArchive>> _outArchives;
-        private static int _totalUsers;
-        private static bool? _modifyCapable;
+        private readonly Dictionary<object, Dictionary<InArchiveFormat, IInArchive>> _inArchives = new Dictionary<object, Dictionary<InArchiveFormat, IInArchive>>();
+        private readonly Dictionary<object, Dictionary<OutArchiveFormat, IOutArchive>> _outArchives = new Dictionary<object, Dictionary<OutArchiveFormat, IOutArchive>>();
+        private int _totalUsers;
+        private bool? _modifyCapable;
 
-        private static void InitUserInFormat(object user, InArchiveFormat format)
+        private void InitUserInFormat(object user, InArchiveFormat format)
         {
             if (!_inArchives.ContainsKey(user))
             {
@@ -79,7 +76,7 @@ namespace SevenZip
             }
         }
 
-        private static void InitUserOutFormat(object user, OutArchiveFormat format)
+        private void InitUserOutFormat(object user, OutArchiveFormat format)
         {
             if (!_outArchives.ContainsKey(user))
             {
@@ -93,10 +90,9 @@ namespace SevenZip
             }
         }
 
-        private static void Init()
+        public IntPtr GetProcAddress(string procName)
         {
-            _inArchives = new Dictionary<object, Dictionary<InArchiveFormat, IInArchive>>();
-            _outArchives = new Dictionary<object, Dictionary<OutArchiveFormat, IOutArchive>>();
+            return NativeGetProcAddress(_modulePtr, procName);
         }
 
         /// <summary>
@@ -104,15 +100,10 @@ namespace SevenZip
         /// </summary>
         /// <param name="user">Caller of the function</param>
         /// <param name="format">Archive format</param>
-        public static void LoadLibrary(object user, Enum format)
+        public void LoadLibrary(object user, Enum format)
         {
             lock (_syncRoot)
             {
-                if (_inArchives == null || _outArchives == null)
-                {
-                    Init();
-                }
-
                 if (_modulePtr == IntPtr.Zero)
                 {
                     if (_libraryFileName == null)
@@ -125,14 +116,14 @@ namespace SevenZip
                         throw new SevenZipLibraryException("DLL file does not exist.");
                     }
 
-                    if ((_modulePtr = NativeMethods.LoadLibrary(_libraryFileName)) == IntPtr.Zero)
+                    if ((_modulePtr = NativeLoadLibrary(_libraryFileName)) == IntPtr.Zero)
                     {
                         throw new SevenZipLibraryException($"failed to load library from \"{_libraryFileName}\".");
                     }
 
-                    if (NativeMethods.GetProcAddress(_modulePtr, "GetHandlerProperty") == IntPtr.Zero)
+                    if (NativeGetProcAddress(_modulePtr, "GetHandlerProperty") == IntPtr.Zero)
                     {
-                        NativeMethods.FreeLibrary(_modulePtr);
+                        NativeFreeLibrary(_modulePtr);
                         throw new SevenZipLibraryException("library is invalid.");
                     }
                 }
@@ -156,7 +147,7 @@ namespace SevenZip
         /// <summary>
         /// Gets the value indicating whether the library supports modifying archives.
         /// </summary>
-        public static bool ModifyCapable
+        public bool ModifyCapable
         {
             get
             {
@@ -196,7 +187,7 @@ namespace SevenZip
                     extractor.ExtractFile(0, outStream);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return false;
             }
@@ -221,7 +212,7 @@ namespace SevenZip
             return true;
         }
 
-        public static LibraryFeature CurrentLibraryFeatures
+        public LibraryFeature CurrentLibraryFeatures
         {
             get
             {
@@ -241,7 +232,8 @@ namespace SevenZip
                     using (var outStream = new MemoryStream())
                     {
                         ExtractionBenchmark("Test.lzma.7z", outStream, ref _features, LibraryFeature.Extract7z);
-                        ExtractionBenchmark("Test.lzma2.7z", outStream, ref _features, LibraryFeature.Extract7zLZMA2);
+                        ExtractionBenchmark("Test.lzma2.7z", outStream, ref _features,
+                                LibraryFeature.Extract7zLZMA2);
 
                         var i = 0;
 
@@ -343,7 +335,7 @@ namespace SevenZip
         /// </summary>
         /// <param name="user">Caller of the function</param>
         /// <param name="format">Archive format</param>
-        public static void FreeLibrary(object user, Enum format)
+        public void FreeLibrary(object user, Enum format)
         {
 #if NET45 || NETSTANDARD2_0
             var sp = new SecurityPermission(SecurityPermissionFlag.UnmanagedCode);
@@ -360,8 +352,9 @@ namespace SevenZip
                             _inArchives[user][archiveFormat] != null)
                         {
                             try
-                            {                            
-                                Marshal.ReleaseComObject(_inArchives[user][archiveFormat]);
+                            {
+                                // TODO: Free
+                                //Marshal.ReleaseComObject(_inArchives[user][archiveFormat]);
                             }
                             catch (InvalidComObjectException) {}
                             
@@ -397,14 +390,11 @@ namespace SevenZip
                         }
                     }
 
-                    if ((_inArchives == null || _inArchives.Count == 0) && (_outArchives == null || _outArchives.Count == 0))
+                    if ( _inArchives.Count == 0 && _outArchives.Count == 0)
                     {
-                        _inArchives = null;
-                        _outArchives = null;
-
                         if (_totalUsers == 0)
                         {
-                            NativeMethods.FreeLibrary(_modulePtr);
+                            NativeFreeLibrary(_modulePtr);
                             _modulePtr = IntPtr.Zero;
                         }
                     }
@@ -417,7 +407,7 @@ namespace SevenZip
         /// </summary>
         /// <param name="format">Archive format.</param>
         /// <param name="user">Archive format user.</param>
-        public static IInArchive InArchive(InArchiveFormat format, object user)
+        public IInArchive InArchive(InArchiveFormat format, object user)
         {
             lock (_syncRoot)
             {
@@ -440,7 +430,7 @@ namespace SevenZip
 
                     var createObject = (NativeMethods.CreateObjectDelegate)
                         Marshal.GetDelegateForFunctionPointer(
-                            NativeMethods.GetProcAddress(_modulePtr, "CreateObject"),
+                            NativeGetProcAddress(_modulePtr, "CreatePseudoCOMObject"),
                             typeof(NativeMethods.CreateObjectDelegate));
 
                     if (createObject == null)
@@ -448,21 +438,22 @@ namespace SevenZip
                         throw new SevenZipLibraryException();
                     }
 
-                    object result;
                     var interfaceId = typeof(IInArchive).GUID;
                     var classID = Formats.InFormatGuids[format];
 
                     try
                     {
-                        createObject(ref classID, ref interfaceId, out result);
+                        createObject(ref classID, ref interfaceId, out var thisPointer);
+                        var result = new InArchiveWrapper(thisPointer);
+                        
+                        InitUserInFormat(user, format);									
+                        _inArchives[user][format] = result;
                     }
                     catch (Exception)
                     {
                         throw new SevenZipLibraryException("Your 7-zip library does not support this archive type.");
                     }
 
-                    InitUserInFormat(user, format);									
-                    _inArchives[user][format] = result as IInArchive;
                 }
 
                 return _inArchives[user][format];
@@ -474,7 +465,7 @@ namespace SevenZip
         /// </summary>
         /// <param name="format">Archive format.</param>  
         /// <param name="user">Archive format user.</param>
-        public static IOutArchive OutArchive(OutArchiveFormat format, object user)
+        public IOutArchive OutArchive(OutArchiveFormat format, object user)
         {
             lock (_syncRoot)
             {
@@ -491,7 +482,7 @@ namespace SevenZip
 
                     var createObject = (NativeMethods.CreateObjectDelegate)
                         Marshal.GetDelegateForFunctionPointer(
-                            NativeMethods.GetProcAddress(_modulePtr, "CreateObject"),
+                            NativeGetProcAddress(_modulePtr, "CreateObject"),
                             typeof(NativeMethods.CreateObjectDelegate));
                     var interfaceId = typeof(IOutArchive).GUID;
                     
@@ -499,10 +490,10 @@ namespace SevenZip
                     try
                     {
                         var classId = Formats.OutFormatGuids[format];
-                        createObject(ref classId, ref interfaceId, out var result);
+                        createObject(ref classId, ref interfaceId, out var thisPointer);
                         
                         InitUserOutFormat(user, format);
-                        _outArchives[user][format] = result as IOutArchive;
+                        _outArchives[user][format] = new OutArchiveWrapper(thisPointer);
                     }
                     catch (Exception)
                     {
@@ -514,7 +505,7 @@ namespace SevenZip
             }
         }
 
-        public static void SetLibraryPath(string libraryPath)
+        public void SetLibraryPath(string libraryPath)
         {
             if (_modulePtr != IntPtr.Zero && !Path.GetFullPath(libraryPath).Equals(Path.GetFullPath(_libraryFileName), StringComparison.OrdinalIgnoreCase))
             {

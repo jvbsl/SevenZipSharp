@@ -65,15 +65,15 @@ namespace SevenZip
             }
             
             PreserveDirectoryStructure = true;
-            SevenZipLibraryManager.LoadLibrary(this, _format);
+            SevenZipLibraryManager.Instance.LoadLibrary(this, _format);
             
             try
             {
-                _archive = SevenZipLibraryManager.InArchive(_format, this);
+                _archive = SevenZipLibraryManager.Instance.InArchive(_format, this);
             }
             catch (SevenZipLibraryException)
             {
-                SevenZipLibraryManager.FreeLibrary(this, _format);
+                SevenZipLibraryManager.Instance.FreeLibrary(this, _format);
                 throw;
             }
             
@@ -83,15 +83,15 @@ namespace SevenZip
                 {
                     CommonDispose();
                     _format = InArchiveFormat.PE;
-                    SevenZipLibraryManager.LoadLibrary(this, _format);
+                    SevenZipLibraryManager.Instance.LoadLibrary(this, _format);
                     
                     try
                     {
-                        _archive = SevenZipLibraryManager.InArchive(_format, this);
+                        _archive = SevenZipLibraryManager.Instance.InArchive(_format, this);
                     }
                     catch (SevenZipLibraryException)
                     {
-                        SevenZipLibraryManager.FreeLibrary(this, _format);
+                        SevenZipLibraryManager.Instance.FreeLibrary(this, _format);
                         throw;
                     }
                 }
@@ -113,17 +113,17 @@ namespace SevenZip
             }            
             
             PreserveDirectoryStructure = true;
-            SevenZipLibraryManager.LoadLibrary(this, _format);
+            SevenZipLibraryManager.Instance.LoadLibrary(this, _format);
             
             try
             {
                 _inStream = new ArchiveEmulationStreamProxy(stream, _offset);
 				_packedSize = stream.Length;
-                _archive = SevenZipLibraryManager.InArchive(_format, this);
+                _archive = SevenZipLibraryManager.Instance.InArchive(_format, this);
             }
             catch (SevenZipLibraryException)
             {
-                SevenZipLibraryManager.FreeLibrary(this, _format);
+                SevenZipLibraryManager.Instance.FreeLibrary(this, _format);
                 throw;
             }
             
@@ -138,11 +138,11 @@ namespace SevenZip
                     {
                         _inStream = new ArchiveEmulationStreamProxy(stream, _offset);
                         _packedSize = stream.Length;
-                        _archive = SevenZipLibraryManager.InArchive(_format, this);
+                        _archive = SevenZipLibraryManager.Instance.InArchive(_format, this);
                     }
                     catch (SevenZipLibraryException)
                     {
-                        SevenZipLibraryManager.FreeLibrary(this, _format);
+                        SevenZipLibraryManager.Instance.FreeLibrary(this, _format);
                         throw;
                     }
                 }
@@ -445,7 +445,8 @@ namespace SevenZip
         {
             if (!_opened)
             {
-                if (OpenArchiveInner(archiveStream, openCallback) != OperationResult.Ok)
+                var temp = OpenArchiveInner(archiveStream, openCallback);
+                if (temp != OperationResult.Ok)
                 {
                     if (!ThrowException(null, new SevenZipArchiveException()))
                     {
@@ -784,7 +785,7 @@ namespace SevenZip
                 }
             }
 
-            SevenZipLibraryManager.FreeLibrary(this, _format);
+            SevenZipLibraryManager.Instance.FreeLibrary(this, _format);
         }
 
         /// <summary>

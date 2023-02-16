@@ -262,14 +262,14 @@ namespace SevenZip
         /// <param name="libraryPath">The path to the 7-zip native library.</param>
         public static void SetLibraryPath(string libraryPath)
         {
-            SevenZipLibraryManager.SetLibraryPath(libraryPath);
+            SevenZipLibraryManager.Instance.SetLibraryPath(libraryPath);
         }
 
         /// <summary>
         /// Gets the current library features.
         /// </summary>
         [CLSCompliant(false)]
-        public static LibraryFeature CurrentLibraryFeatures => SevenZipLibraryManager.CurrentLibraryFeatures;
+        public static LibraryFeature CurrentLibraryFeatures => SevenZipLibraryManager.Instance.CurrentLibraryFeatures;
 
         /// <summary>
         /// Determines whether the specified System.Object is equal to the current SevenZipBase.

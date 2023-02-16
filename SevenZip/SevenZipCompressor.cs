@@ -181,7 +181,7 @@ namespace SevenZip
 
         private IOutArchive MakeOutArchive(IInStream inArchiveStream)
         {
-            var inArchive = SevenZipLibraryManager.InArchive(Formats.InForOutFormats[_archiveFormat], this);
+            var inArchive = SevenZipLibraryManager.Instance.InArchive(Formats.InForOutFormats[_archiveFormat], this);
 
             using (var openCallback = GetArchiveOpenCallback())
             {
@@ -264,8 +264,8 @@ namespace SevenZip
                 {
                     var setter =
                         CompressionMode == CompressionMode.Create && _updateData.FileNamesToModify == null ? 
-                            (ISetProperties) SevenZipLibraryManager.OutArchive(_archiveFormat, this) : 
-                            (ISetProperties) SevenZipLibraryManager.InArchive(Formats.InForOutFormats[_archiveFormat], this);
+                            (ISetProperties) SevenZipLibraryManager.Instance.OutArchive(_archiveFormat, this) : 
+                            (ISetProperties) SevenZipLibraryManager.Instance.InArchive(Formats.InForOutFormats[_archiveFormat], this);
                     
                     if (setter == null)
                     {
@@ -1240,13 +1240,13 @@ namespace SevenZip
 
                         if (CompressionMode == CompressionMode.Create || !_compressingFilesOnDisk)
                         {
-                            SevenZipLibraryManager.LoadLibrary(this, _archiveFormat);
-                            outArchive = SevenZipLibraryManager.OutArchive(_archiveFormat, this);
+                            SevenZipLibraryManager.Instance.LoadLibrary(this, _archiveFormat);
+                            outArchive = SevenZipLibraryManager.Instance.OutArchive(_archiveFormat, this);
                         }
                         else
                         {
                             // Create IInArchive, read it and convert to IOutArchive
-                            SevenZipLibraryManager.LoadLibrary(this, Formats.InForOutFormats[_archiveFormat]);
+                            SevenZipLibraryManager.Instance.LoadLibrary(this, Formats.InForOutFormats[_archiveFormat]);
 
                             if ((outArchive = MakeOutArchive(inArchiveStream)) == null)
                             {
@@ -1276,11 +1276,11 @@ namespace SevenZip
             {
                 if (CompressionMode == CompressionMode.Create || !_compressingFilesOnDisk)
                 {
-                    SevenZipLibraryManager.FreeLibrary(this, _archiveFormat);
+                    SevenZipLibraryManager.Instance.FreeLibrary(this, _archiveFormat);
                 }
                 else
                 {
-                    SevenZipLibraryManager.FreeLibrary(this, Formats.InForOutFormats[_archiveFormat]);
+                    SevenZipLibraryManager.Instance.FreeLibrary(this, Formats.InForOutFormats[_archiveFormat]);
                     File.Delete(_archiveName);
                 }
 
@@ -1524,13 +1524,13 @@ namespace SevenZip
 
                         if (CompressionMode == CompressionMode.Create || !_compressingFilesOnDisk)
                         {
-                            SevenZipLibraryManager.LoadLibrary(this, _archiveFormat);
-                            outArchive = SevenZipLibraryManager.OutArchive(_archiveFormat, this);
+                            SevenZipLibraryManager.Instance.LoadLibrary(this, _archiveFormat);
+                            outArchive = SevenZipLibraryManager.Instance.OutArchive(_archiveFormat, this);
                         }
                         else
                         {
                             // Create IInArchive, read it and convert to IOutArchive
-                            SevenZipLibraryManager.LoadLibrary(
+                            SevenZipLibraryManager.Instance.LoadLibrary(
                                 this, Formats.InForOutFormats[_archiveFormat]);
                             if ((outArchive = MakeOutArchive(inArchiveStream)) == null)
                             {
@@ -1558,11 +1558,11 @@ namespace SevenZip
             {
                 if (CompressionMode == CompressionMode.Create || !_compressingFilesOnDisk)
                 {
-                    SevenZipLibraryManager.FreeLibrary(this, _archiveFormat);
+                    SevenZipLibraryManager.Instance.FreeLibrary(this, _archiveFormat);
                 }
                 else
                 {
-                    SevenZipLibraryManager.FreeLibrary(this, Formats.InForOutFormats[_archiveFormat]);
+                    SevenZipLibraryManager.Instance.FreeLibrary(this, Formats.InForOutFormats[_archiveFormat]);
                     File.Delete(_archiveName);
                 }
 
@@ -1598,7 +1598,7 @@ namespace SevenZip
 
             try
             {
-                SevenZipLibraryManager.LoadLibrary(this, _archiveFormat);
+                SevenZipLibraryManager.Instance.LoadLibrary(this, _archiveFormat);
                 ISequentialOutStream sequentialArchiveStream;
 
                 using ((sequentialArchiveStream = GetOutStream(outStream)) as IDisposable)
@@ -1608,7 +1608,7 @@ namespace SevenZip
                         try
                         {
                             CheckedExecute(
-                                SevenZipLibraryManager.OutArchive(_archiveFormat, this).UpdateItems(
+                                SevenZipLibraryManager.Instance.OutArchive(_archiveFormat, this).UpdateItems(
                                     sequentialArchiveStream, 1, auc),
                                 SevenZipCompressionFailedException.DEFAULT_MESSAGE, auc);
                         }
@@ -1621,7 +1621,7 @@ namespace SevenZip
             }
             finally
             {
-                SevenZipLibraryManager.FreeLibrary(this, _archiveFormat);
+                SevenZipLibraryManager.Instance.FreeLibrary(this, _archiveFormat);
                 OnEvent(CompressionFinished, EventArgs.Empty, false);
             }
 
@@ -1642,7 +1642,7 @@ namespace SevenZip
         {
             ClearExceptions();
 
-            if (!SevenZipLibraryManager.ModifyCapable)
+            if (!SevenZipLibraryManager.Instance.ModifyCapable)
             {
                 throw new SevenZipLibraryException("The specified 7zip native library does not support this method.");
             }
@@ -1705,7 +1705,7 @@ namespace SevenZip
                     {
                         IOutArchive outArchive;
                         // Create IInArchive, read it and convert to IOutArchive
-                        SevenZipLibraryManager.LoadLibrary(
+                        SevenZipLibraryManager.Instance.LoadLibrary(
                             this, Formats.InForOutFormats[_archiveFormat]);
                         if ((outArchive = MakeOutArchive(inArchiveStream)) == null)
                         {
@@ -1739,7 +1739,7 @@ namespace SevenZip
             }
             finally
             {
-                SevenZipLibraryManager.FreeLibrary(this, Formats.InForOutFormats[_archiveFormat]);
+                SevenZipLibraryManager.Instance.FreeLibrary(this, Formats.InForOutFormats[_archiveFormat]);
                 File.Delete(archiveName);
                 FinalizeUpdate();
                 _compressingFilesOnDisk = false;
