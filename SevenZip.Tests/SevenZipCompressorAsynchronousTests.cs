@@ -59,7 +59,7 @@
             var compressor = new SevenZipCompressor {DirectoryStructure = false};
             compressor.CompressionFinished += (o, e) => compressionFinishedInvoked = true;
 
-            compressor.BeginCompressFiles(TemporaryFile, @"TestData\zip.zip", @"TestData\tar.tar");
+            compressor.BeginCompressFiles(TemporaryFile, @"TestData/zip.zip", @"TestData/tar.tar");
 
             var timeToWait = 1000;
             while (!compressionFinishedInvoked)
@@ -91,7 +91,7 @@
             var compressor = new SevenZipCompressor { DirectoryStructure = false };
             compressor.CompressionFinished += (o, e) => compressionFinishedInvoked = true;
 
-            using (var inputStream = File.OpenRead(@"TestData\zip.zip"))
+            using (var inputStream = File.OpenRead(@"TestData/zip.zip"))
             {
                 using (var outputStream = new FileStream(TemporaryFile, FileMode.Create))
                 {
@@ -124,7 +124,7 @@
         {
             var compressor = new SevenZipCompressor { DirectoryStructure = false };
 
-            compressor.CompressFiles(TemporaryFile, @"TestData\tar.tar");
+            compressor.CompressFiles(TemporaryFile, @"TestData/tar.tar");
 
             var compressionFinishedInvoked = false;
             compressor.CompressionFinished += (o, e) => compressionFinishedInvoked = true;
@@ -160,7 +160,7 @@
             var compressor = new SevenZipCompressor { DirectoryStructure = false };
             compressor.CompressionFinished += (o, e) => compressionFinishedInvoked = true;
 
-            compressor.BeginCompressFilesEncrypted(TemporaryFile, "secure", @"TestData\zip.zip", @"TestData\tar.tar");
+            compressor.BeginCompressFilesEncrypted(TemporaryFile, "secure", @"TestData/zip.zip", @"TestData/tar.tar");
 
             var timeToWait = 1000;
             while (!compressionFinishedInvoked)
@@ -190,7 +190,7 @@
         public async Task CompressFilesAsync()
         {
             var compressor = new SevenZipCompressor { DirectoryStructure = false };
-            await compressor.CompressFilesAsync(TemporaryFile, @"TestData\zip.zip", @"TestData\tar.tar");
+            await compressor.CompressFilesAsync(TemporaryFile, @"TestData/zip.zip", @"TestData/tar.tar");
 
             Assert.IsTrue(File.Exists(TemporaryFile));
 
@@ -222,7 +222,7 @@
         public async Task CompressFilesEncryptedAsync()
         {
             var compressor = new SevenZipCompressor { DirectoryStructure = false };
-            await compressor.CompressFilesEncryptedAsync(TemporaryFile, "secure", @"TestData\zip.zip", @"TestData\tar.tar");
+            await compressor.CompressFilesEncryptedAsync(TemporaryFile, "secure", @"TestData/zip.zip", @"TestData/tar.tar");
 
             Assert.IsTrue(File.Exists(TemporaryFile));
 
@@ -232,7 +232,11 @@
                 Assert.IsTrue(extractor.ArchiveFileNames.Contains("zip.zip"));
                 Assert.IsTrue(extractor.ArchiveFileNames.Contains("tar.tar"));
 
-                Assert.Throws<ExtractionFailedException>(() => extractor.ExtractArchive(OutputDirectory));
+                Assert.Throws<ExtractionFailedException>(() =>
+                                                         {
+                                                             extractor.ExtractArchive(OutputDirectory);
+                                                             ;
+                                                         });
             }
         }
     }

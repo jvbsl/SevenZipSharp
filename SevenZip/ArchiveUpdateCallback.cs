@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace SevenZip
 {
     using System;
@@ -444,7 +446,9 @@ namespace SevenZip
                         {
                             val = _updateData.FileNamesToModify[(int) index];
                         }
-                        value.Value = Marshal.StringToBSTR(val);
+
+                        
+                        value.Value = NativeMethods.MarshalBStrNew(val);
                         #endregion
                         break;
                     case ItemPropId.IsDirectory:
@@ -584,17 +588,17 @@ namespace SevenZip
                                       : _entries == null
                                           ? ""
                                           : Path.GetExtension(_entries[index]);
-                                value.Value = Marshal.StringToBSTR(val);
+                                value.Value = NativeMethods.MarshalBStrNew(val);
                             }
                             catch (ArgumentException)
                             {
-                                value.Value = Marshal.StringToBSTR("");
+                                value.Value = NativeMethods.MarshalBStrNew("");
                             }
                         }
                         else
                         {
                             val = Path.GetExtension(_updateData.ArchiveFileData[(int) index].FileName);
-                            value.Value = Marshal.StringToBSTR(val);
+                            value.Value = NativeMethods.MarshalBStrNew(val);
                         }
 
                         #endregion

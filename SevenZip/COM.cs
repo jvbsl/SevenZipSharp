@@ -1,4 +1,6 @@
-﻿namespace SevenZip
+﻿using System.Text;
+
+namespace SevenZip
 {
     using System;
     using System.Collections.Generic;
@@ -129,7 +131,9 @@
                 switch (VarType)
                 {
                     case VarEnum.VT_BSTR:
-                        return Marshal.PtrToStringBSTR(Value);
+                        var res = NativeMethods.MarshalPtrToBStrNew(Value);
+                       
+                        return res;
                     case VarEnum.VT_EMPTY:
                         return null;
                     case VarEnum.VT_FILETIME:
@@ -160,6 +164,8 @@
                                     return Int64Value;
                                 case VarEnum.VT_I4:
                                     return Int32Value;
+                                case VarEnum.VT_BOOL:
+                                    return Int32Value != 0;
                                 default:
                                     return 0;
                             }
@@ -865,8 +871,8 @@
         /// <returns>Zero if Ok</returns>
         
         int GetStream(
-            [MarshalAs(UnmanagedType.LPWStr)] string name,
-            [Out, MarshalAs(UnmanagedType.Interface)] out IInStream inStream);
+            string name,
+            out IInStream inStream);
     }    
 
     /// <summary>
@@ -1088,7 +1094,7 @@
         /// <param name="varType">Variant type</param>
         void GetArchivePropertyInfo(
             uint index,
-            [MarshalAs(UnmanagedType.BStr)] out string name,
+            out string name,
             out ItemPropId propId, // PROPID
             out ushort varType); //VARTYPE
     }

@@ -161,7 +161,7 @@ namespace SevenZip
                         }
 
                         var dllVersionInfo = FileVersionInfo.GetVersionInfo(_libraryFileName);
-                        _modifyCapable = dllVersionInfo.FileMajorPart >= 9;
+                        _modifyCapable = true; // TODO: dllVersionInfo.FileMajorPart >= 9;
                     }
 
                     return _modifyCapable.Value;
@@ -376,7 +376,7 @@ namespace SevenZip
                         {
                             try
                             {
-                                Marshal.ReleaseComObject(_outArchives[user][outArchiveFormat]);
+                                // Marshal.ReleaseComObject(_outArchives[user][outArchiveFormat]); TODO: 
                             }
                             catch (InvalidComObjectException) {}
                             
@@ -482,7 +482,7 @@ namespace SevenZip
 
                     var createObject = (NativeMethods.CreateObjectDelegate)
                         Marshal.GetDelegateForFunctionPointer(
-                            NativeGetProcAddress(_modulePtr, "CreateObject"),
+                            NativeGetProcAddress(_modulePtr, "CreatePseudoCOMObject"),
                             typeof(NativeMethods.CreateObjectDelegate));
                     var interfaceId = typeof(IOutArchive).GUID;
                     
@@ -495,7 +495,7 @@ namespace SevenZip
                         InitUserOutFormat(user, format);
                         _outArchives[user][format] = new OutArchiveWrapper(thisPointer);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         throw new SevenZipLibraryException("Your 7-zip library does not support this archive type.");
                     }

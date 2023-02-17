@@ -1,4 +1,6 @@
-﻿namespace SevenZip.Tests
+﻿using System.Runtime.InteropServices;
+
+namespace SevenZip.Tests
 {
     using System;
     using System.Diagnostics;
@@ -19,10 +21,12 @@
             var binaryFormatter = new BinaryFormatter();
 
             using (var ms = new MemoryStream())
+                using (var sw = new StreamWriter(ms))
             {
                 using (var fileStream = File.Create(TemporaryFile))
                 {
-                    binaryFormatter.Serialize(ms, argumentException);
+                    //binaryFormatter.Serialize(ms, argumentException);
+                    sw.Write("hallo test1234");
                     var compressor = new SevenZipCompressor();
                     compressor.CompressStream(ms, fileStream);
                 }
@@ -42,7 +46,7 @@
             var sfx = new SevenZipSfx(sfxModule);
             var compressor = new SevenZipCompressor {DirectoryStructure = false};
 
-            compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip");
+            compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip");
 
             sfx.MakeSfx(TemporaryFile, sfxFile);
 
@@ -54,11 +58,14 @@
                 Assert.AreEqual("zip.zip", extractor.ArchiveFileNames[0]);
             }
 
-            Assert.DoesNotThrow(() =>
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                var process = Process.Start(sfxFile);
-                process?.Kill();
-            });
+                Assert.DoesNotThrow(() =>
+                {
+                    var process = Process.Start(sfxFile);
+                    process?.Kill();
+                });
+            }
         }
 #endif
 
@@ -68,7 +75,7 @@
             using (var output = new FileStream(TemporaryFile, FileMode.Create))
             {
                 var encoder = new LzmaEncodeStream(output);
-                using (var inputSample = new FileStream(@"TestData\zip.zip", FileMode.Open))
+                using (var inputSample = new FileStream(@"TestData/zip.zip", FileMode.Open))
                 {
                     int bufSize = 24576, count;
                     var buf = new byte[bufSize];

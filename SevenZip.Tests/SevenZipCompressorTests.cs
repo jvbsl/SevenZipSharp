@@ -31,6 +31,7 @@
         }
 
         [Test]
+        [Platform("Win")]
         public void CompressDirectory_WithSfnPath()
         {
             var compressor = new SevenZipCompressor
@@ -66,7 +67,7 @@
                 ArchiveFormat = OutArchiveFormat.Zip
             };
 
-            compressor.CompressFiles(TemporaryFile, @"TESTDA~1\emptyfile.txt");
+            compressor.CompressFiles(TemporaryFile, @"TESTDA~1/emptyfile.txt");
             Assert.IsTrue(File.Exists(TemporaryFile));
 
             using (var extractor = new SevenZipExtractor(TemporaryFile))
@@ -85,7 +86,7 @@
                 DirectoryStructure = false
             };
             
-            compressor.CompressFiles(TemporaryFile, @"Testdata\7z_LZMA2.7z");
+            compressor.CompressFiles(TemporaryFile, @"TestData/7z_LZMA2.7z");
             Assert.IsTrue(File.Exists(TemporaryFile));
 
             using (var extractor = new SevenZipExtractor(TemporaryFile))
@@ -127,7 +128,7 @@
                 DirectoryStructure = false
             };
 
-            compressor.CompressFiles(TemporaryFile, @"Testdata\7z_LZMA2.7z");
+            compressor.CompressFiles(TemporaryFile, @"Testdata/7z_LZMA2.7z");
             Assert.IsTrue(File.Exists(TemporaryFile));
 
             using (var extractor = new SevenZipExtractor(TemporaryFile))
@@ -137,7 +138,7 @@
 
             compressor.CompressionMode = CompressionMode.Append;
 
-            compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip");
+            compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip");
 
             using (var extractor = new SevenZipExtractor(TemporaryFile))
             {
@@ -154,7 +155,7 @@
                 EncryptHeaders = true
             };
 
-            compressor.CompressFilesEncrypted(TemporaryFile, "password", @"TestData\7z_LZMA2.7z", @"TestData\zip.zip");
+            compressor.CompressFilesEncrypted(TemporaryFile, "password", @"TestData/7z_LZMA2.7z", @"TestData/zip.zip");
 
             var modificationList = new Dictionary<int, string>
             {
@@ -197,7 +198,7 @@
                 DirectoryStructure = false
             };
 
-            compressor.CompressFiles(TemporaryFile, @"Testdata\7z_LZMA2.7z");
+            compressor.CompressFiles(TemporaryFile, @"TestData/7z_LZMA2.7z");
             Assert.IsTrue(File.Exists(TemporaryFile));
 
             compressor.ModifyArchive(TemporaryFile, new Dictionary<int, string> { { 0, "renamed.7z" }});
@@ -221,7 +222,7 @@
                 DirectoryStructure = false
             };
 
-            compressor.CompressFiles(TemporaryFile, @"Testdata\7z_LZMA2.7z");
+            compressor.CompressFiles(TemporaryFile, @"Testdata/7z_LZMA2.7z");
             Assert.IsTrue(File.Exists(TemporaryFile));
 
             compressor.ModifyArchive(TemporaryFile, new Dictionary<int, string> { { 0, null } });
@@ -245,7 +246,7 @@
                 VolumeSize = 100
             };
 
-            compressor.CompressFiles(TemporaryFile, @"Testdata\7z_LZMA2.7z");
+            compressor.CompressFiles(TemporaryFile, @"TestData/7z_LZMA2.7z");
 
             Assert.AreEqual(3, Directory.GetFiles(OutputDirectory).Length);
             Assert.IsTrue(File.Exists($"{TemporaryFile}.003"));
@@ -258,7 +259,7 @@
 
             using (var stream = File.Create(TemporaryFile))
             {
-                compressor.CompressFiles(stream, @"TestData\zip.zip");
+                compressor.CompressFiles(stream, @"TestData/zip.zip");
             }
             
             Assert.IsTrue(File.Exists(TemporaryFile));
@@ -273,7 +274,7 @@
         [Test]
         public void CompressFromStreamTest()
         {
-            using (var input = File.OpenRead(@"TestData\zip.zip"))
+            using (var input = File.OpenRead(@"TestData/zip.zip"))
             {
                 using (var output = File.Create(TemporaryFile))
                 {
@@ -292,7 +293,7 @@
             using (var extractor = new SevenZipExtractor(TemporaryFile))
             {
                 Assert.AreEqual(1, extractor.FilesCount);
-                Assert.AreEqual(new FileInfo(@"TestData\zip.zip").Length, extractor.ArchiveFileData[0].Size);
+                Assert.AreEqual(new FileInfo(@"TestData/zip.zip").Length, extractor.ArchiveFileData[0].Size);
             }
         }
 
@@ -303,7 +304,7 @@
 
             var fileDict = new Dictionary<string, string>
             {
-                {"zip.zip", @"TestData\zip.zip"}
+                {"zip.zip", @"TestData/zip.zip"}
             };
 
             compressor.CompressFileDictionary(fileDict, TemporaryFile);
@@ -353,7 +354,7 @@
                 CompressionMethod = method
             };
 
-            compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip");
+            compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip");
 
             Assert.IsTrue(File.Exists(TemporaryFile));
         }

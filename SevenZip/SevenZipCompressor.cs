@@ -198,6 +198,11 @@ namespace SevenZip
                 _oldFilesCount = inArchive.GetNumberOfItems();
             }
 
+            if (inArchive is InArchiveWrapper wrapper)
+            {
+                return new OutArchiveWrapper(wrapper);
+            }
+
             return (IOutArchive) inArchive;
         }
 
@@ -264,8 +269,8 @@ namespace SevenZip
                 {
                     var setter =
                         CompressionMode == CompressionMode.Create && _updateData.FileNamesToModify == null ? 
-                            (ISetProperties) SevenZipLibraryManager.Instance.OutArchive(_archiveFormat, this) : 
-                            (ISetProperties) SevenZipLibraryManager.Instance.InArchive(Formats.InForOutFormats[_archiveFormat], this);
+                            new SetPropertiesWrapper(SevenZipLibraryManager.Instance.OutArchive(_archiveFormat, this)) : 
+                            new SetPropertiesWrapper(SevenZipLibraryManager.Instance.InArchive(Formats.InForOutFormats[_archiveFormat], this));
                     
                     if (setter == null)
                     {
@@ -318,19 +323,19 @@ namespace SevenZip
 
 #region Initialize compression properties
 
-                        names.Add(Marshal.StringToBSTR("x"));
+                        names.Add(NativeMethods.MarshalBStrNew("x"));
                     values.Add(new PropVariant());
 
                     if (_compressionMethod != CompressionMethod.Default)
                     {
                         names.Add(_archiveFormat == OutArchiveFormat.Zip ? 
-                            Marshal.StringToBSTR("m") : 
-                            Marshal.StringToBSTR("0"));
+                            NativeMethods.MarshalBStrNew("m") : 
+                            NativeMethods.MarshalBStrNew("0"));
 
                         var pv = new PropVariant
                         {
                             VarType = VarEnum.VT_BSTR,
-                            Value = Marshal.StringToBSTR(Formats.MethodNames[_compressionMethod])
+                            Value = NativeMethods.MarshalBStrNew(Formats.MethodNames[_compressionMethod])
                         };
 
                         values.Add(pv);
@@ -347,7 +352,7 @@ namespace SevenZip
 
                         #endregion
 
-                        names.Add(Marshal.StringToBSTR(pair.Key));
+                        names.Add(NativeMethods.MarshalBStrNew(pair.Key));
                         var pv = new PropVariant();
 
                         if (pair.Value.All(char.IsDigit))
@@ -358,7 +363,7 @@ namespace SevenZip
                         else
                         {
                             pv.VarType = VarEnum.VT_BSTR;
-                            pv.Value = Marshal.StringToBSTR(pair.Value);
+                            pv.Value = NativeMethods.MarshalBStrNew(pair.Value);
                         }
 
                         values.Add(pv);
@@ -413,8 +418,8 @@ namespace SevenZip
 
                     if (EncryptHeaders && _archiveFormat == OutArchiveFormat.SevenZip && !SwitchIsInCustomParameters("he"))
                     {
-                        names.Add(Marshal.StringToBSTR("he"));
-                        var tmp = new PropVariant {VarType = VarEnum.VT_BSTR, Value = Marshal.StringToBSTR("on")};
+                        names.Add(NativeMethods.MarshalBStrNew("he"));
+                        var tmp = new PropVariant {VarType = VarEnum.VT_BSTR, Value = NativeMethods.MarshalBStrNew("on")};
                         values.Add(tmp);
                     }
 
@@ -426,12 +431,12 @@ namespace SevenZip
                         ZipEncryptionMethod != ZipEncryptionMethod.ZipCrypto &&
                         !SwitchIsInCustomParameters("em"))
                     {
-                        names.Add(Marshal.StringToBSTR("em"));
+                        names.Add(NativeMethods.MarshalBStrNew("em"));
 
                         var tmp = new PropVariant
                         {
                             VarType = VarEnum.VT_BSTR,
-                            Value = Marshal.StringToBSTR(Enum.GetName(typeof(ZipEncryptionMethod), ZipEncryptionMethod))
+                            Value = NativeMethods.MarshalBStrNew(Enum.GetName(typeof(ZipEncryptionMethod), ZipEncryptionMethod))
                         };
 
                         values.Add(tmp);

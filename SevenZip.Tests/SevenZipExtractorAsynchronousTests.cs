@@ -17,7 +17,7 @@
             var fileExtractionStartedInvoked = 0;
             var fileExtractionFinishedInvoked = 0;
 
-            using (var extractor = new SevenZipExtractor(@"TestData\multiple_files.7z"))
+            using (var extractor = new SevenZipExtractor(@"TestData/multiple_files.7z"))
             {
                 extractor.EventSynchronization = EventSynchronizationStrategy.AlwaysSynchronous;
 
@@ -73,7 +73,7 @@
 
             using (var fileStream = File.Create(TemporaryFile))
             {
-                using (var extractor = new SevenZipExtractor(@"TestData\multiple_files.7z"))
+                using (var extractor = new SevenZipExtractor(@"TestData/multiple_files.7z"))
                 {
                     extractor.EventSynchronization = EventSynchronizationStrategy.AlwaysSynchronous;
                     extractor.ExtractionFinished += (o, e) => extractionFinishedInvoked = true;
@@ -103,7 +103,7 @@
         {
             var extractionFinishedInvoked = false;
 
-            using (var extractor = new SevenZipExtractor(@"TestData\multiple_files.7z"))
+            using (var extractor = new SevenZipExtractor(@"TestData/multiple_files.7z"))
             {
                 extractor.EventSynchronization = EventSynchronizationStrategy.AlwaysSynchronous;
 
@@ -131,7 +131,7 @@
         [Test]
         public async Task ExtractArchiveAsync()
         {
-            using (var extractor = new SevenZipExtractor(@"TestData\multiple_files.7z"))
+            using (var extractor = new SevenZipExtractor(@"TestData/multiple_files.7z"))
             {
                 await extractor.ExtractArchiveAsync(OutputDirectory);
             }
@@ -142,7 +142,7 @@
         [Test]
         public async Task ExtractFileAsync_ByIndex()
         {
-            using (var extractor = new SevenZipExtractor(@"TestData\multiple_files.7z"))
+            using (var extractor = new SevenZipExtractor(@"TestData/multiple_files.7z"))
             {
                 using (var fileStream = File.Create(TemporaryFile))
                 {
@@ -157,7 +157,7 @@
         [Test]
         public async Task ExtractFileAsync_ByFileName()
         {
-            using (var extractor = new SevenZipExtractor(@"TestData\multiple_files.7z"))
+            using (var extractor = new SevenZipExtractor(@"TestData/multiple_files.7z"))
             {
                 using (var fileStream = File.Create(TemporaryFile))
                 {
@@ -172,7 +172,7 @@
         [Test]
         public async Task ExtractFilesAsync_ByCallback()
         {
-            using (var extractor = new SevenZipExtractor(@"TestData\zip.zip"))
+            using (var extractor = new SevenZipExtractor(@"TestData/zip.zip"))
             {
                 await extractor.ExtractFilesAsync(args => { args.ExtractToFile = TemporaryFile; });
             }
@@ -183,7 +183,7 @@
         [Test]
         public async Task ExtractFilesAsync_ByIndex()
         {
-            using (var extractor = new SevenZipExtractor(@"TestData\multiple_files.7z"))
+            using (var extractor = new SevenZipExtractor(@"TestData/multiple_files.7z"))
             {
                 await extractor.ExtractFilesAsync(OutputDirectory, 0, 2);
             }
@@ -194,7 +194,7 @@
         [Test]
         public async Task ExtractFilesAsync_ByFileName()
         {
-            using (var extractor = new SevenZipExtractor(@"TestData\multiple_files.7z"))
+            using (var extractor = new SevenZipExtractor(@"TestData/multiple_files.7z"))
             {
                 await extractor.ExtractFilesAsync(OutputDirectory, "file1.txt", "file3.txt");
             }

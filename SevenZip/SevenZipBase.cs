@@ -178,6 +178,8 @@ namespace SevenZip
         /// <param name="handler">The handler responsible for the exception.</param>
         internal bool ThrowException(CallbackBase handler, params Exception[] e)
         {
+            Console.WriteLine(e[0].StackTrace);
+            
             if (_reportErrors && (handler == null || !handler.Canceled))
             {
                 throw e[0];

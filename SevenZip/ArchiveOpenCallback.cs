@@ -90,7 +90,7 @@ namespace SevenZip
             {
                 case ItemPropId.Name:
                     value.VarType = VarEnum.VT_BSTR;
-                    value.Value = Marshal.StringToBSTR(_fileInfo.FullName);
+                    value.Value = NativeMethods.MarshalBStrNew(_fileInfo.FullName);
                     break;
                 case ItemPropId.IsDirectory:
                     value.VarType = VarEnum.VT_BOOL;

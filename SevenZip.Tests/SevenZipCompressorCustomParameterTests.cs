@@ -20,10 +20,10 @@
 
             // Check parameters for PPMd compression.
             compressor.CustomParameters.Add("mem", "25");
-            Assert.Throws<CompressionFailedException>(() => compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip"));
+            Assert.Throws<CompressionFailedException>(() => compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip"));
             compressor.CustomParameters.Remove("mem");
             compressor.CustomParameters.Add("o", "10");
-            Assert.Throws<CompressionFailedException>(() => compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip"));
+            Assert.Throws<CompressionFailedException>(() => compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip"));
             compressor.CustomParameters.Remove("o");
         }
 
@@ -36,11 +36,11 @@
             };
 
             compressor.CustomParameters.Add("x", "3");
-            Assert.Throws<CompressionFailedException>(() => compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip"));
+            Assert.Throws<CompressionFailedException>(() => compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip"));
             compressor.CustomParameters.Remove("x");
 
             compressor.CustomParameters.Add("em", "AES128");
-            Assert.Throws<CompressionFailedException>(() => compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip"));
+            Assert.Throws<CompressionFailedException>(() => compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip"));
         }
 
         [Test]
@@ -60,7 +60,7 @@
             compressor.CustomParameters.Add("cu", "on");
             compressor.CustomParameters.Add("cp", "866");
 
-            compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip");
+            compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip");
         }
 
         [Test]
@@ -80,7 +80,7 @@
             compressor.CustomParameters.Add("cu", "on");
             compressor.CustomParameters.Add("cp", "866");
 
-            compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip");
+            compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip");
         }
 
         [Test]
@@ -95,7 +95,7 @@
             compressor.CustomParameters.Add("mem", "128m");
             compressor.CustomParameters.Add("o", "9");
 
-            compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip");
+            compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip");
         }
 
         [Test]
@@ -108,11 +108,11 @@
             };
 
             compressor.CustomParameters.Add("d", "1048576b");
-            compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip");
+            compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip");
 
             compressor.CustomParameters.Remove("d");
             compressor.CustomParameters.Add("d", "16");
-            compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip");
+            compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip");
         }
 
         [Test]
@@ -137,7 +137,7 @@
             compressor.CustomParameters.Add("ta", "on");
             compressor.CustomParameters.Add("tr", "off");
 
-            compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip");
+            compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip");
         }
 
         [Test]
@@ -158,7 +158,7 @@
             compressor.CustomParameters.Add("lp", "1");
             compressor.CustomParameters.Add("pb", "3");
             
-            compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip");
+            compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip");
         }
 
         [Test]
@@ -172,7 +172,7 @@
 
             compressor.CustomParameters.Add("c", "512m");
 
-            compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip");
+            compressor.CompressFiles(TemporaryFile, @"TestData/zip.zip");
         }
     }
 }
