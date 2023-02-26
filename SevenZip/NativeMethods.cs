@@ -58,7 +58,7 @@ namespace SevenZip
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return SysAllocStringLen(val, (val?.Length ?? 0));
+                return Marshal.StringToBSTR(val);//SysAllocStringLen(val, (val?.Length ?? 0));
             }
 
             return SysAllocStringLen32(val, (val?.Length ?? 0));

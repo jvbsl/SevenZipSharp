@@ -116,16 +116,18 @@ namespace SevenZip
                         throw new SevenZipLibraryException("DLL file does not exist.");
                     }
 
+                    var res = NativeLoadLibrary(@"C:\Users\susch\source\repos\SevenZipCBindings\base\CPP\7zip\Bundles\Format7zF\x64\7z.dll");
+                    //var res = NativeLoadLibrary(@"C:\Temp\7z.dll");
                     if ((_modulePtr = NativeLoadLibrary(_libraryFileName)) == IntPtr.Zero)
                     {
                         throw new SevenZipLibraryException($"failed to load library from \"{_libraryFileName}\".");
                     }
 
-                    if (NativeGetProcAddress(_modulePtr, "GetHandlerProperty") == IntPtr.Zero)
+                    /*if (NativeGetProcAddress(_modulePtr, "GetHandlerProperty") == IntPtr.Zero)
                     {
                         NativeFreeLibrary(_modulePtr);
                         throw new SevenZipLibraryException("library is invalid.");
-                    }
+                    }*/
                 }
 
                 if (format is InArchiveFormat archiveFormat)

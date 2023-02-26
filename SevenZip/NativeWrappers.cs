@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+
 using SevenZip;
 
 namespace SevenZip
@@ -678,9 +679,7 @@ namespace SevenZip
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int GetStreamDelegate(IntPtr thisPointer, IntPtr name, out IntPtr inStream);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate int GetPropertyDelegate(IntPtr thisPointer, ItemPropId propId,
-            ref PropVariant value);
+        public delegate int GetPropertyDelegate(IntPtr thisPointer, ItemPropId propId, ref PropVariant value);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int SetDelegate(IntPtr thisPointer, IntPtr files, IntPtr bytes);
 
